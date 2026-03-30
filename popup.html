@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=380">
+  <title>Smart Password Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="title">PassForge</h1>
+          <p class="subtitle">Smart Password Generator</p>
+        </div>
+      </div>
+      <div class="header-badge" id="statusBadge">Active</div>
+    </header>
+
+    <!-- Current Site Info -->
+    <div class="site-card" id="siteCard">
+      <div class="site-label">Current Site</div>
+      <div class="site-domain" id="currentDomain">Loading...</div>
+      <div class="site-preview">
+        <span class="preview-label">Password Preview</span>
+        <div class="preview-value" id="livePreview">—</div>
+      </div>
+    </div>
+
+    <!-- Mode Toggle -->
+    <div class="section">
+      <div class="section-label">Password Mode</div>
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="patternModeBtn" data-mode="pattern">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+          </svg>
+          Pattern
+        </button>
+        <button class="mode-btn" id="defaultModeBtn" data-mode="default">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          Default
+        </button>
+      </div>
+    </div>
+
+    <!-- Default Mode Panel -->
+    <div class="panel" id="defaultPanel" style="display:none;">
+      <div class="section-label">Master Password</div>
+      <div class="input-group">
+        <input type="password" id="defaultPasswordInput" class="text-input" placeholder="Enter your default password..." autocomplete="off">
+        <button class="toggle-vis-btn" id="toggleVisBtn" title="Show/Hide password">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+      <p class="hint">This password will be used for all websites.</p>
+    </div>
+
+    <!-- Pattern Mode Panel -->
+    <div class="panel" id="patternPanel">
+      <div class="section-label">Generation Method</div>
+      <div class="method-list" id="methodList">
+        <!-- Methods are rendered by JS -->
+      </div>
+
+      <!-- Custom Template (shown when method 6 is selected) -->
+      <div class="custom-template-section" id="customTemplateSection" style="display:none;">
+        <div class="section-label">Custom Template</div>
+        <input type="text" id="customTemplateInput" class="text-input" placeholder="*{Domain}{year}#" value="*{Domain}{year}#">
+        <div class="template-vars">
+          <span class="var-chip" data-var="{domain}">{domain}</span>
+          <span class="var-chip" data-var="{Domain}">{Domain}</span>
+          <span class="var-chip" data-var="{DOMAIN}">{DOMAIN}</span>
+          <span class="var-chip" data-var="{year}">{year}</span>
+          <span class="var-chip" data-var="{yy}">{yy}</span>
+          <span class="var-chip" data-var="{len}">{len}</span>
+          <span class="var-chip" data-var="{rev}">{rev}</span>
+          <span class="var-chip" data-var="{Rev}">{Rev}</span>
+          <span class="var-chip" data-var="{first3}">{first3}</span>
+          <span class="var-chip" data-var="{last3}">{last3}</span>
+          <span class="var-chip" data-var="{vowel}">{vowel}</span>
+          <span class="var-chip" data-var="{kbd}">{kbd}</span>
+        </div>
+        <p class="hint">Click chips to insert variables. Example: <code>@{Domain}_{yy}!</code></p>
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div class="section options-section">
+      <div class="section-label">Options</div>
+      <label class="switch-row">
+        <span class="switch-label">Show icon on password fields</span>
+        <div class="switch">
+          <input type="checkbox" id="showIconToggle" checked>
+          <span class="slider"></span>
+        </div>
+      </label>
+      <label class="switch-row">
+        <span class="switch-label">Auto-fill on page load</span>
+        <div class="switch">
+          <input type="checkbox" id="autoFillToggle">
+          <span class="slider"></span>
+        </div>
+      </label>
+    </div>
+
+    <!-- Site Overrides -->
+    <div class="section overrides-section">
+      <div class="section-label">
+        Site Overrides
+        <button class="add-override-btn" id="addOverrideBtn" title="Add site override">+</button>
+      </div>
+      <div class="overrides-list" id="overridesList">
+        <!-- Rendered by JS -->
+      </div>
+      <div class="override-form" id="overrideForm" style="display:none;">
+        <input type="text" id="overrideDomain" class="text-input small" placeholder="e.g. github">
+        <select id="overrideMethod" class="select-input small">
+          <!-- Populated by JS -->
+        </select>
+        <button class="save-override-btn" id="saveOverrideBtn">✓</button>
+      </div>
+    </div>
+
+    <!-- Save Status -->
+    <div class="save-status" id="saveStatus">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      Saved
+    </div>
+
+  </div>
+
+  <script src="generator.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

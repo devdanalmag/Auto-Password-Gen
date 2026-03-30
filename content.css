@@ -1,0 +1,88 @@
+/* ─── Smart Password Generator — Content Script Styles ─── */
+
+.spg-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  pointer-events: auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.spg-fill-btn,
+.spg-copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  outline: none;
+}
+
+.spg-fill-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+}
+
+.spg-fill-btn:hover {
+  background: linear-gradient(135deg, #818cf8, #a78bfa);
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+}
+
+.spg-fill-btn:active {
+  transform: scale(0.95);
+}
+
+.spg-copy-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #475569, #64748b);
+  color: #e2e8f0;
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.spg-icon-wrapper:hover .spg-copy-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.spg-copy-btn:hover {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  transform: scale(1.1) !important;
+}
+
+.spg-copy-btn:active {
+  transform: scale(0.95) !important;
+}
+
+/* Toast notification */
+.spg-toast {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: linear-gradient(135deg, #1e1b4b, #312e81);
+  color: #e0e7ff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.spg-toast-show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
