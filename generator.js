@@ -6,25 +6,64 @@
 const PasswordGenerator = (() => {
 
   /**
+   * Known two-part TLD suffixes (e.g. co.uk, com.ng).
+   * Used to correctly identify the registrable domain.
+   */
+  const TWO_PART_TLDS = new Set([
+    'co.uk', 'co.ke', 'co.za', 'co.in', 'co.jp', 'co.kr', 'co.nz', 'co.id',
+    'co.il', 'co.th', 'co.tz', 'co.ug', 'co.zw', 'co.ao', 'co.mz',
+    'com.au', 'com.br', 'com.cn', 'com.mx', 'com.ng', 'com.sg', 'com.tr',
+    'com.tw', 'com.hk', 'com.my', 'com.ph', 'com.pk', 'com.eg', 'com.ar',
+    'com.co', 'com.pe', 'com.vn', 'com.bd', 'com.ua', 'com.gh',
+    'org.uk', 'org.au', 'org.in', 'org.ng', 'org.za',
+    'net.au', 'net.in', 'net.ng', 'net.za',
+    'ac.uk', 'ac.in', 'ac.jp', 'ac.za', 'ac.ke',
+    'gov.uk', 'gov.au', 'gov.ng', 'gov.in', 'gov.za',
+    'edu.au', 'edu.ng', 'edu.in', 'edu.pk',
+    'me.uk', 'ne.jp', 'or.jp', 'or.ke', 'or.id',
+  ]);
+
+  /**
    * Extract clean domain name from a URL
-   * e.g. "https://www.github.com/login" → "github"
+   * Strips ALL subdomains (www, app, login, mail, etc.) and returns
+   * only the main (second-level) domain name.
+   *
+   * Examples:
+   *   "https://www.github.com/login"       → "github"
+   *   "https://app.github.com"             → "github"
+   *   "https://login.mail.google.com"      → "google"
+   *   "https://dashboard.stripe.com"       → "stripe"
+   *   "https://www.bbc.co.uk/news"         → "bbc"
+   *   "https://app.example.com.ng"         → "example"
    */
   function extractDomain(url) {
     try {
       let hostname = new URL(url).hostname;
-      // Remove www. prefix
-      hostname = hostname.replace(/^www\./, '');
-      // Get the main domain part (before TLD)
+
       const parts = hostname.split('.');
-      // For things like "co.uk", "com.ng" etc, take the part before
-      if (parts.length >= 2) {
-        // Simple approach: take the first meaningful part
-        return parts[0];
+
+      // Single-label host (e.g. "localhost")
+      if (parts.length <= 1) return hostname;
+
+      // Check if the last two parts form a known two-part TLD
+      const lastTwo = parts.slice(-2).join('.');
+      const isTwoPartTld = TWO_PART_TLDS.has(lastTwo);
+
+      // The registrable domain is:
+      //   - For two-part TLDs (co.uk): last 3 parts → e.g. bbc.co.uk → "bbc"
+      //   - For normal TLDs (.com):    last 2 parts → e.g. github.com → "github"
+      const domainPartCount = isTwoPartTld ? 3 : 2;
+
+      if (parts.length >= domainPartCount) {
+        // Return the label just before the TLD
+        return parts[parts.length - domainPartCount];
       }
-      return hostname;
+
+      // Not enough parts (e.g. just "github.com" with domainPartCount = 2)
+      return parts[0];
     } catch (e) {
-      // Fallback: try to extract from string
-      const match = url.match(/(?:https?:\/\/)?(?:www\.)?([^.\/?]+)/);
+      // Fallback: try to extract the main domain from a raw string
+      const match = url.match(/(?:https?:\/\/)?(?:[a-z0-9-]+\.)*?([a-z0-9-]+)\.(?:com|org|net|io|dev|app|co|me|info|biz|edu|gov)(?:\.[a-z]{2,3})?/i);
       return match ? match[1] : 'default';
     }
   }
